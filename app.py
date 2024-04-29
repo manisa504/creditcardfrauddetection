@@ -5,7 +5,7 @@ from datetime import datetime
 from sklearn.preprocessing import LabelEncoder
 
 # Function to load the trained model
-@st.cache_resource
+@st.cache_data
 def load_model(filename):
     return joblib.load(filename)
 
@@ -28,6 +28,15 @@ def preprocess_input(account_number, merchant_id, mcc,
     account_number_encoded = LabelEncoder().fit_transform([account_number])
     merchant_id_encoded = LabelEncoder().fit_transform([merchant_id])
 
+    # Handling missing values
+    # Replace missing values with a default value
+    default_value = 0  # Or any other appropriate default value
+    mcc = mcc if mcc is not None else default_value
+    merchant_country = merchant_country if merchant_country is not None else default_value
+    pos_entry_mode = pos_entry_mode if pos_entry_mode is not None else default_value
+    transaction_amount = transaction_amount if transaction_amount is not None else default_value
+    available_cash = available_cash if available_cash is not None else default_value
+
     # Preparing the DataFrame for prediction
     input_data = pd.DataFrame([[account_number_encoded[0], merchant_id_encoded[0], mcc, 
                                 merchant_country, pos_entry_mode, 
@@ -44,6 +53,7 @@ def main():
 
     # Load the model
     model = load_model('fraud_model.pkl')
+
     # Display an image
     image_url = "https://syndelltech.com/wp-content/uploads/2023/01/fraud-detection-using-machine-ml.png"
     st.image(image_url, caption='Fraud Detection using Machine Learning')
@@ -79,7 +89,6 @@ def main():
         # Display the prediction
         st.write("Prediction:", "Fraud" if prediction[0] == 1 else "Not Fraud")
 
-
     # Button to load sample fraudulent transaction data
     if st.button("Load Sample Fraudulent Transaction"):
         # Sample fraudulent transaction data
@@ -96,7 +105,10 @@ def main():
         }
 
         # Store the sample data in the session state
-        # Add bounding box around the fields
+        for key, value in sample_fraud_data.items():
+            st.session_state[key] = value
+
+        # Display the sample fraudulent transaction data
         st.markdown('---')
         st.markdown('**Sample Fraudulent Transaction Data**')
         st.markdown('---')
