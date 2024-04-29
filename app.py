@@ -44,6 +44,9 @@ def main():
 
     # Load the model
     model = load_model('fraud_model.pkl')
+    # Display an image
+    image_url = "https://syndelltech.com/wp-content/uploads/2023/01/fraud-detection-using-machine-ml.png"
+    st.image(image_url, caption='Fraud Detection using Machine Learning')
 
     st.write("Please input the transaction data for fraud prediction.")
 
@@ -92,17 +95,20 @@ def main():
             'transaction_time': datetime(2023, 1, 1, 3, 0)  # Example time
         }
 
-        # Update fields with sample data
-        st.session_state['account_number'] = sample_fraud_data['account_number']
-        st.session_state['merchant_id'] = sample_fraud_data['merchant_id']
-        st.session_state['mcc'] = sample_fraud_data['mcc']
-        st.session_state['merchant_country'] = sample_fraud_data['merchant_country']
-        st.session_state['pos_entry_mode'] = sample_fraud_data['pos_entry_mode']
-        st.session_state['transaction_amount'] = sample_fraud_data['transaction_amount']
-        st.session_state['available_cash'] = sample_fraud_data['available_cash']
-        st.session_state['transaction_date'] = sample_fraud_data['transaction_date']
-        st.session_state['transaction_time'] = sample_fraud_data['transaction_time']
-
+        # Store the sample data in the session state
+        # Add bounding box around the fields
+        st.markdown('---')
+        st.markdown('**Sample Fraudulent Transaction Data**')
+        st.markdown('---')
+        st.markdown(f'**Account Number:** {st.session_state["account_number"]}')
+        st.markdown(f'**Merchant ID:** {st.session_state["merchant_id"]}')
+        st.markdown(f'**MCC:** {st.session_state["mcc"]}')
+        st.markdown(f'**Merchant Country:** {st.session_state["merchant_country"]}')
+        st.markdown(f'**POS Entry Mode:** {st.session_state["pos_entry_mode"]}')
+        st.markdown(f'**Transaction Amount:** {st.session_state["transaction_amount"]}')
+        st.markdown(f'**Available Cash:** {st.session_state["available_cash"]}')
+        st.markdown(f'**Transaction Date:** {st.session_state["transaction_date"]}')
+        st.markdown(f'**Transaction Time:** {st.session_state["transaction_time"]}')
 
 if __name__ == '__main__':
     main()
