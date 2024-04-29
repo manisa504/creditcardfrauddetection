@@ -1,13 +1,15 @@
 import streamlit as st
 import pandas as pd
-import joblib
+import pickle
 from datetime import datetime
 from sklearn.preprocessing import LabelEncoder
 
 # Function to load the trained model
 @st.cache_data
 def load_model(filename):
-    return joblib.load(filename)
+    with open(filename, 'rb') as file:
+        model = pickle.load(file)
+    return model
 
 def preprocess_input(account_number, merchant_id, mcc, 
                      merchant_country, pos_entry_mode, 
@@ -45,6 +47,13 @@ def preprocess_input(account_number, merchant_id, mcc,
                               columns=['accountNumber', 'merchantId', 'mcc', 'merchantCountry', 
                                        'posEntryMode', 'transactionAmount', 
                                        'availableCash', 'DayOfWeek', 'HourOfDay'])
+
+    # Check for missing values
+    missing_values = input_data.isnull().sum()
+
+    # If there are missing values, impute them
+    if missing_values.any():
+        input_data.fillna(0, inplace=True)  # Replace missing values with 0, or any other appropriate default value
 
     return input_data
 

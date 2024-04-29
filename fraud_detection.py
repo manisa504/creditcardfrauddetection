@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[64]:
+# In[1]:
 
 
 import pandas as pd
@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import roc_curve, auc
 
 
-# In[3]:
+# In[2]:
 
 
 #read transactions data
@@ -22,7 +22,7 @@ transactions = pd.read_csv('transactions_obf.csv')
 transactions.head()
 
 
-# In[4]:
+# In[3]:
 
 
 #read fraud labels
@@ -30,7 +30,7 @@ labels = pd.read_csv('labels_obf.csv')
 labels.head()
 
 
-# In[5]:
+# In[4]:
 
 
 #add a fraud column to the transaction data and compare it with labels data frame to match the eventiD and classify it as fraud or not
@@ -40,32 +40,32 @@ transactions['fraud'] = transactions['fraud'].astype(int)
 transactions.head()
 
 
-# In[6]:
+# In[5]:
 
 
 transactions.describe()
 
 
-# In[7]:
+# In[6]:
 
 
 transactions.groupby('fraud').count()
 
 
-# In[8]:
+# In[7]:
 
 
 transactions.info()
 
 
-# In[9]:
+# In[8]:
 
 
 #looking for missing values
 transactions.isnull().sum().sort_values()
 
 
-# In[10]:
+# In[9]:
 
 
 #since merchantZip has a lot of missing values and not useful for analysis, we can drop it
@@ -73,7 +73,7 @@ transactions.drop(['merchantZip'], axis=1, inplace=True)
 transactions.head()
 
 
-# In[11]:
+# In[10]:
 
 
 #converting transactionTime to datetime
@@ -81,7 +81,7 @@ transactions['transactionTime'] = pd.to_datetime(transactions['transactionTime']
 transactions.head()
 
 
-# In[12]:
+# In[11]:
 
 
 #histogram of fraud and normal transactions
@@ -92,15 +92,16 @@ plt.ylabel('Frequency')
 plt.show()
 
 
-# In[13]:
+# In[12]:
 
 
 # Filter transactions with fraud == 1 and plot the average transaction amount for each available cash amount
 fraudulent_transactions = transactions[transactions['fraud'] == 1]
 fraudulent_transactions['transactionAmount'].groupby(fraudulent_transactions['availableCash']).mean().plot(kind='bar')
+plt.title('Average transaction amount for each available cash amount')
 
 
-# In[14]:
+# In[13]:
 
 
 # Filter only the fraudulent transactions and then group by merchantId and count
@@ -110,20 +111,20 @@ fraud_transactions = transactions[transactions['fraud'] == 1].groupby('merchantI
 fraud_transactions.sort_values(ascending=False).head(10).plot(kind='barh', figsize=(10,5), title='Number of fraudulent transactions by merchant ID')
 
 
-# In[15]:
+# In[14]:
 
 
 #check for any outliers in the data
 sns.boxplot(x=transactions['transactionAmount'])
 
 
-# In[16]:
+# In[15]:
 
 
 transactions.columns
 
 
-# In[17]:
+# In[16]:
 
 
 # Filter only the fraudulent transactions and then group by accountNumber and count
@@ -133,7 +134,7 @@ fraud_transactions = transactions[transactions['fraud'] == 1].groupby('accountNu
 fraud_transactions.sort_values(ascending=False).head(10).plot(kind='bar', figsize=(10,5), title='Number of fraudulent transactions by Account Number')
 
 
-# In[18]:
+# In[17]:
 
 
 # Filter only the fraudulent transactions and then group by posEntryMode and count
@@ -151,7 +152,7 @@ plt.show()
 
 # Looks like POS 81 entry style has the most fradulent transactions
 
-# In[19]:
+# In[18]:
 
 
 #modify the TransactionTime column to extract the day of the week and the hour of the day
@@ -159,7 +160,7 @@ transactions['DayOfWeek'] = transactions['transactionTime'].dt.day_name()
 transactions['HourOfDay'] = transactions['transactionTime'].dt.hour
 
 
-# In[20]:
+# In[19]:
 
 
 #check if transaction fraud is higher any specific day of the week
@@ -167,7 +168,7 @@ fraud_transactions = transactions[transactions['fraud'] == 1].groupby('DayOfWeek
 fraud_transactions.plot(kind='bar', figsize=(10,5), title='Fraud Transactions by Day of Week')
 
 
-# In[21]:
+# In[20]:
 
 
 #check if transaction fraud is higher any specific time of the day
@@ -175,26 +176,26 @@ fraud_transactions = transactions[transactions['fraud'] == 1].groupby('HourOfDay
 fraud_transactions.plot(kind='bar', figsize=(10,5), title='Fraud Transactions by Hour of Day')
 
 
-# In[22]:
+# In[21]:
 
 
 transactions.head()
 
 
-# In[23]:
+# In[22]:
 
 
 #dropping eventID and traactionTime since we have fraud as a unique identifier for each event
 transactions = transactions.drop(['eventId','transactionTime'], axis=1)
 
 
-# In[24]:
+# In[23]:
 
 
 transactions.info()
 
 
-# In[25]:
+# In[24]:
 
 
 #Need to change the label encoding for the categorical variables to numerical variables for accountNumber, MerchantID, DayOfWeek
@@ -203,6 +204,17 @@ transactions['accountNumber'] = le.fit_transform(transactions['accountNumber'])
 transactions['merchantId'] = le.fit_transform(transactions['merchantId'])
 transactions['DayOfWeek'] = le.fit_transform(transactions['DayOfWeek'])
 transactions.info()
+
+
+# In[25]:
+
+
+#create a small dataset with only the fraud transactions
+fraud_transactions = transactions[transactions['fraud'] == 1]
+fraud_transactions.head()
+
+#output the fraud transactions to a csv file
+fraud_transactions.to_csv('fraud_transactions.csv', index=False)
 
 
 # In[26]:
@@ -268,7 +280,7 @@ y_pred = knn.predict(X_test)
 knn.score(X_test,y_test)
 
 
-# In[34]:
+# In[33]:
 
 
 # Creating neighbors and accuracies lists for neighbors between 1 and 13
@@ -290,7 +302,7 @@ for neighbor in neighbors:
 print(neighbors, '\n', train_accuracies, '\n', test_accuracies)
 
 
-# In[35]:
+# In[34]:
 
 
 #visualizing model complexity
@@ -310,7 +322,7 @@ plt.ylabel("Accuracy")
 plt.show()
 
 
-# In[36]:
+# In[35]:
 
 
 #based on this model, looks like the best neighbors is 8
@@ -324,7 +336,7 @@ y_pred = knn.predict(X_test)
 knn.score(X_test,y_test)
 
 
-# In[37]:
+# In[36]:
 
 
 # Import confusion matrix
@@ -336,7 +348,7 @@ print(confusion_matrix(y_test, y_pred))
 print(classification_report(y_test, y_pred))
 
 
-# In[38]:
+# In[37]:
 
 
 # Predict probabilities
@@ -360,7 +372,7 @@ plt.show()
 
 # This Curve doesn't look very good. We will try Logistic Regression and see that improves
 
-# In[39]:
+# In[38]:
 
 
 #let's try logistic regression
@@ -377,7 +389,7 @@ y_pred_probs = logreg.predict_proba(X_test)[:,1]
 print(y_pred_probs[:10])
 
 
-# In[40]:
+# In[39]:
 
 
 # Import roc_curve
@@ -396,7 +408,7 @@ plt.title('ROC Curve for Fraud Prediction')
 plt.show()
 
 
-# In[41]:
+# In[40]:
 
 
 # Calculate roc_auc_score
@@ -409,7 +421,7 @@ print(confusion_matrix(y_test, y_pred))
 print(classification_report(y_test, y_pred))
 
 
-# In[42]:
+# In[41]:
 
 
 #trying cross validation to see if it improves the model
@@ -426,7 +438,7 @@ cv_scores = cross_val_score(reg, X, y, cv=kf)
 print(cv_scores)
 
 
-# In[43]:
+# In[42]:
 
 
 # Getting the mean CV score
@@ -439,7 +451,7 @@ print(np.std(cv_scores))
 print(np.quantile(cv_scores, [0.025, 0.975]))
 
 
-# In[44]:
+# In[43]:
 
 
 #Performing hyperparameter tuning using GridSearchCV
@@ -462,7 +474,7 @@ print("Tuned logreg paramaters: {}".format(logreg_cv.best_params_))
 print("Tuned logreg score: {}".format(logreg_cv.best_score_))
 
 
-# In[45]:
+# In[44]:
 
 
 #trying the logistic regression model with the hyperparameters found in the grid search
@@ -478,7 +490,7 @@ y_pred = logreg.predict(X_test)
 print('Accuracy of logistic regression classifier on test set: {:.2f}'.format(logreg.score(X_test, y_test)))
 
 
-# In[46]:
+# In[45]:
 
 
 # Generate the confusion matrix and classification report and roc_auc_score
@@ -491,7 +503,7 @@ print(classification_report(y_test, y_pred))
 
 # Checking if other models might be better and trying crossvalidation
 
-# In[57]:
+# In[46]:
 
 
 from sklearn.tree import DecisionTreeClassifier
@@ -517,7 +529,7 @@ plt.show()
 
 # Looks Like might perform better KNN and Random Forest perform better with CrossValidation 
 
-# In[62]:
+# In[47]:
 
 
 # Import confusion matrix
@@ -537,7 +549,7 @@ print(confusion_matrix(y_test, y_pred))
 print(classification_report(y_test, y_pred))
 
 
-# In[68]:
+# In[48]:
 
 
 # Import roc_curve
@@ -566,7 +578,7 @@ plt.show()
 
 # Let's see if CrossValidation improves this score
 
-# In[69]:
+# In[49]:
 
 
 from sklearn.model_selection import cross_val_score
@@ -582,7 +594,7 @@ print(cv_scores)
 print(f'cv_scores mean:{np.mean(cv_scores)}')
 
 
-# In[70]:
+# In[50]:
 
 
 #check to see if the model has improved
@@ -593,7 +605,7 @@ print(confusion_matrix(y_test, y_pred))
 print(classification_report(y_test, y_pred))
 
 
-# In[72]:
+# In[51]:
 
 
 # Import roc_curve
@@ -620,7 +632,7 @@ plt.legend(loc="lower right")
 plt.show()
 
 
-# In[73]:
+# In[52]:
 
 
 print(roc_auc_score(y_test, y_pred))
@@ -629,7 +641,7 @@ print(auc(fpr, tpr))
 
 # There is no change in model performance. Let try Random Forest and since crossvalidation has no effect, we will not be doing it for RandomForest
 
-# In[74]:
+# In[53]:
 
 
 # Import the necessary libraries
@@ -653,7 +665,7 @@ print(classification_report(y_test, y_pred))
 
 # The F1 and Recall scores have improved indicating that fraud detection number has gone up significantly but let's check the ROC curves.
 
-# In[75]:
+# In[54]:
 
 
 # Import roc_curve
@@ -682,7 +694,7 @@ plt.show()
 
 # The ROC curve hasn't improved much. This is might be due to class Imbalace. We can do oversampling using SMOTE to see we can improve this.
 
-# In[76]:
+# In[56]:
 
 
 from imblearn.over_sampling import SMOTE
@@ -691,7 +703,7 @@ sm = SMOTE(random_state=42)
 X_res, y_res = sm.fit_resample(X_train, y_train)
 
 
-# In[77]:
+# In[57]:
 
 
 # Import the necessary libraries
@@ -713,7 +725,7 @@ print(confusion_matrix(y_test, y_pred))
 print(classification_report(y_test, y_pred))
 
 
-# In[78]:
+# In[58]:
 
 
 # Import necessary libraries
@@ -742,7 +754,7 @@ plt.legend(loc="lower right")
 plt.show()
 
 
-# In[79]:
+# In[59]:
 
 
 print(roc_auc_score(y_test, y_pred))
@@ -751,7 +763,7 @@ print(auc(fpr, tpr))
 
 # The AOC and the fraud detection has improved significantly due to oversampling. Let's try to do some randomized grid search to see if we can get better hyperparameters to try
 
-# In[82]:
+# In[60]:
 
 
 from sklearn.model_selection import RandomizedSearchCV
@@ -796,9 +808,28 @@ print(confusion_matrix(y_test, y_pred))
 print(classification_report(y_test, y_pred))
 
 
-# The model has improved significantly with a recall score of 0.59. 
+# The model has improved significantly with a recall score of 0.7
 
-# In[83]:
+# In[61]:
+
+
+#Plot the confusion matrix
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+get_ipython().run_line_magic('matplotlib', 'inline')
+
+# Plot the confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(5,5))
+sns.heatmap(cm, annot=True, fmt=".0f", linewidths=0.5, square = True, cmap = 'Blues_r')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.title('Confusion Matrix', size = 15)
+plt.show()
+
+
+# In[62]:
 
 
 # Import necessary libraries
@@ -827,11 +858,41 @@ plt.legend(loc="lower right")
 plt.show()
 
 
-# In[84]:
+# In[63]:
 
 
 print(roc_auc_score(y_test, y_pred))
 print(auc(fpr, tpr))
+
+
+# In[65]:
+
+
+import pickle
+
+def save_model(model, filename):
+    """
+    Save the trained model to a file using pickle.
+
+    Args:
+    model: The trained model to be saved.
+    filename: The name of the file where the model will be saved.
+    """
+    with open(filename, 'wb') as file:
+        pickle.dump(model, file)
+    print(f"Model saved to {filename}")
+
+if __name__ == "__main__":
+    # Replace 'rf_best' with the variable name of your trained model
+    save_model(rf_best, 'fraud_model.pkl')
+
+
+
+# In[ ]:
+
+
+#convert to python script
+get_ipython().system('jupyter nbconvert --to script fraud_detection.ipynb')
 
 
 # 
