@@ -7,9 +7,9 @@
 ![Seaborn](https://img.shields.io/badge/Seaborn-0.11.2-blue)
 ![sickit](https://img.shields.io/badge/scikit--learn-compatible-orange)
 
-
-## Introduction to Credit Card Fraud Detection Project
 https://creditcardfrauddetection1.streamlit.app/
+## Introduction to Credit Card Fraud Detection Project
+
 In the modern digital landscape, credit card fraud poses a significant threat to financial institutions and consumers. The Credit Card Fraud Detection Project addresses this critical issue by leveraging advanced data analysis techniques and machine learning algorithms. By meticulously analyzing transactional data, the project aims to effectively identify and predict fraudulent activities, thereby mitigating financial risks and safeguarding assets.
 
 Central to the project is a sophisticated predictive model trained using the Synthetic Minority Over-sampling Technique (SMOTE) to handle class imbalance, a prevalent challenge in fraud detection where fraudulent transactions are significantly outnumbered by legitimate ones. The model's performance is rigorously evaluated using robust metrics such as the Receiver Operating Characteristic (ROC) curve and the Area Under the Curve (AUC), ensuring accurate measurement of both fraud prevalence and detection efficacy.
