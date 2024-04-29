@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "fraud_detection",
+			"path": "."
+		}
+	],
+	"settings": {}
+}
